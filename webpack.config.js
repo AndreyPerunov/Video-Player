@@ -1,8 +1,9 @@
 const currentTask = process.env.npm_lifecycle_event
 const path = require("path")
-const MiniCssExtractPlugin = require("mini-css-extract-plugin")
 const HtmlWebpackPlugin = require("html-webpack-plugin")
 const { WebpackManifestPlugin } = require("webpack-manifest-plugin")
+const MiniCssExtractPlugin = require("mini-css-extract-plugin")
+const CssMinimizerPlugin = require("css-minimizer-webpack-plugin")
 
 const config = {
   entry: "./app/Main.js",
@@ -42,9 +43,17 @@ const config = {
 if (currentTask == "build") {
   config.mode = "production"
   delete config.devServer
-  config.output.filename = "[name].[hash].js"
-  config.output.path = path.resolve(__dirname, "dist")
-  config.output.clean = true
+  config.output = {
+    filename: "[name].[chunkhash].js",
+    chunkFilename: "[name].[chunkhash].js",
+    path: path.resolve(__dirname, "dist"),
+    clean: true
+  }
+  config.optimization = {
+    splitChunks: { chunks: "all" },
+    minimize: true,
+    minimizer: [`...`, new CssMinimizerPlugin()]
+  }
   config.module.rules[0].use[0] = MiniCssExtractPlugin.loader
   config.plugins.push(new MiniCssExtractPlugin({ filename: "main.[hash].css" }), new WebpackManifestPlugin())
 }

@@ -4,7 +4,7 @@ import ReactDOM from "react-dom/client"
 import "./styles/main.scss"
 
 function Main() {
-  return <h1>THIS IS A TEST!!!</h1>
+  return <></>
 }
 
 const root = ReactDOM.createRoot(document.querySelector("#app"))
