@@ -4,6 +4,15 @@ const HtmlWebpackPlugin = require("html-webpack-plugin")
 const { WebpackManifestPlugin } = require("webpack-manifest-plugin")
 const MiniCssExtractPlugin = require("mini-css-extract-plugin")
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin")
+const fse = require("fs-extra")
+
+class RunAfterCompile {
+  apply(compiler) {
+    compiler.hooks.done.tap("Copy images", function () {
+      fse.copySync("./app/assets", "./dist/assets")
+    })
+  }
+}
 
 const config = {
   entry: "./app/Main.js",
@@ -55,7 +64,7 @@ if (currentTask == "build") {
     minimizer: [`...`, new CssMinimizerPlugin()]
   }
   config.module.rules[0].use[0] = MiniCssExtractPlugin.loader
-  config.plugins.push(new MiniCssExtractPlugin({ filename: "main.[hash].css" }), new WebpackManifestPlugin())
+  config.plugins.push(new MiniCssExtractPlugin({ filename: "main.[hash].css" }), new WebpackManifestPlugin(), new RunAfterCompile())
 }
 
 module.exports = config
