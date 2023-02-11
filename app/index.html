@@ -7,8 +7,35 @@
     <title>Video Player | By Andrey Perunov</title>
   </head>
   <body>
-    <div class="video-container">
-      <video src="./assets/cute-cat.mp4" controlsList="nodownload"></video>
+    <div class="wrapper">
+      <div class="row row--gutters">
+        <div class="row__medium-9">
+          <div class="video-container">
+            <video src="./assets/cute-cat.mp4" controlsList="nodownload"></video>
+            <div class="video-container__controls">
+              <div class="video-container__controls__timeline"></div>
+              <div class="video-container__controls__buttons">
+                <button class="video-container__controls__buttons__play-pause-btn">
+                  <svg class="video-container__controls__buttons__play-icon" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M8,5.14V19.14L19,12.14L8,5.14Z" />
+                  </svg>
+                  <svg class="video-container__controls__buttons__pause-icon" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M14,19H18V5H14M6,19H10V5H6V19Z" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row__medium-3">
+          <div class="boiler"></div>
+          <div class="boiler"></div>
+          <div class="boiler"></div>
+          <div class="boiler"></div>
+          <div class="boiler"></div>
+          <div class="boiler"></div>
+        </div>
+      </div>
     </div>
     <div id="app"></div>
   </body>

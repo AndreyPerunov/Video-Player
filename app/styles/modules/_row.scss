@@ -1,0 +1,16 @@
+.row {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+
+  &__medium-9 {
+    grid-column: span 9;
+  }
+
+  &--gutters {
+    column-gap: 5%;
+  }
+
+  &__medium-3 {
+    grid-column: span 3;
+  }
+}
