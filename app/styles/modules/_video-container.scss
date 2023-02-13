@@ -4,9 +4,16 @@
   width: 100%;
   max-width: 1200px;
   position: relative;
+  background-color: black;
 
   video {
     width: 100%;
+  }
+
+  &--theater {
+    max-width: initial;
+    width: 100%;
+    display: block;
   }
 
   &:hover &__controls,
@@ -15,11 +22,11 @@
     opacity: 1;
   }
 
-  &--paused &__controls__buttons__pause-icon {
+  &--paused &__controls__buttons__play-pause-btn__pause-icon {
     display: none;
   }
 
-  &:not(&--paused) &__controls__buttons__play-icon {
+  &:not(&--paused) &__controls__buttons__play-pause-btn__play-icon {
     display: none;
   }
 
