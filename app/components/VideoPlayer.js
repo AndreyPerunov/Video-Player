@@ -1,13 +1,73 @@
-import React from "react"
-// video-container--theater || video-container--paused
+import React, { useEffect, useRef, useState } from "react"
+import Spinner from "./Spinner"
+
 function VideoPlayer() {
+  const video = useRef(null)
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [isWaiting, setIsWaiting] = useState(false)
+
+  useEffect(() => {
+    document.addEventListener("keyup", videoKeyPressHandler)
+    return () => document.removeEventListener("keyup", videoKeyPressHandler)
+  }, [])
+
+  useEffect(() => {
+    if (!video.current) return
+
+    function onPlay() {
+      if (isWaiting) setIsWaiting(false)
+      setIsPlaying(true)
+    }
+
+    function onPause() {
+      if (isWaiting) setIsWaiting(false)
+      setIsPlaying(false)
+    }
+
+    function onWaiting() {
+      if (isPlaying) setIsWaiting(false)
+      setIsWaiting(true)
+    }
+
+    const videoElement = video.current
+
+    videoElement.addEventListener("play", onPlay)
+    videoElement.addEventListener("playing", onPlay)
+    videoElement.addEventListener("pause", onPause)
+    videoElement.addEventListener("waiting", onWaiting)
+
+    return () => {
+      videoElement.removeEventListener("play", onPlay)
+      videoElement.removeEventListener("playing", onPlay)
+      videoElement.removeEventListener("pause", onPause)
+      videoElement.removeEventListener("waiting", onWaiting)
+    }
+  }, [video.current])
+
+  //TODO: I have some lags here
+  function videoKeyPressHandler(e) {
+    if (e.keyCode == 75 || e.keyCode == 75) {
+      toggleVideo()
+    }
+  }
+
+  function toggleVideo() {
+    if (!video.current) return
+    if (isPlaying) {
+      video.current.pause()
+    } else {
+      video.current.play()
+    }
+  }
+
   return (
-    <div className="video-container video-container--theater">
-      <video src="./assets/cute-cat.mp4" controlsList="nodownload"></video>
+    <div className={"video-container " + (isPlaying ? "" : "video-container--paused")}>
+      <Spinner />
+      <video onClick={toggleVideo} ref={video} src="./assets/cute-cat.mp4" controlsList="nodownload"></video>
       <div className="video-container__controls">
         <div className="video-container__controls__timeline"></div>
         <div className="video-container__controls__buttons">
-          <button className="video-container__controls__buttons__play-pause-btn">
+          <button onClick={toggleVideo} className="video-container__controls__buttons__play-pause-btn">
             <svg className="video-container__controls__buttons__play-pause-btn__play-icon" viewBox="0 0 24 24">
               <path fill="currentColor" d="M8,5.14V19.14L19,12.14L8,5.14Z" />
             </svg>

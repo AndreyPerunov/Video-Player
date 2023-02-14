@@ -11,11 +11,11 @@ import Cards from "./components/Cards"
 function Main() {
   return (
     <Page title="Video Player">
-      <div class="row row--gutters">
-        <div class="row__large-9">
+      <div className="row row--gutters">
+        <div className="row__large-9">
           <VideoPlayer />
         </div>
-        <div class="row__large-3">
+        <div className="row__large-3">
           <Cards />
         </div>
       </div>
