@@ -62,10 +62,16 @@ function VideoPlayer() {
 
   return (
     <div className={"video-container " + (isPlaying ? "" : "video-container--paused")}>
-      <Spinner />
+      {isWaiting && <Spinner />}
       <video onClick={toggleVideo} ref={video} src="./assets/cute-cat.mp4" controlsList="nodownload"></video>
+      <img className="thumbnail-img" />
       <div className="video-container__controls">
-        <div className="video-container__controls__timeline"></div>
+        <div className="video-container__controls__timeline-container">
+          <div className="video-container__controls__timeline-container__timeline">
+            <img className="video-container__controls__timeline-container__timeline__preview-img" />
+            <div className="video-container__controls__timeline-container__timeline__thumb-indicator"></div>
+          </div>
+        </div>
         <div className="video-container__controls__buttons">
           <button onClick={toggleVideo} className="video-container__controls__buttons__play-pause-btn">
             <svg className="video-container__controls__buttons__play-pause-btn__play-icon" viewBox="0 0 24 24">
