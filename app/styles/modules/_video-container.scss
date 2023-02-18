@@ -1,6 +1,3 @@
-$preview-position: 0;
-$progress-position: 0.1;
-
 .video-container {
   aspect-ratio: 16 / 9;
   overflow: hidden;
@@ -79,6 +76,10 @@ $progress-position: 0.1;
     }
 
     &__timeline-container {
+      --preview-position: 0;
+      --progress-position: 0;
+      --buffer-position: 0;
+
       height: 7px;
       margin-inline: 0.5rem;
       cursor: pointer;
@@ -117,9 +118,8 @@ $progress-position: 0.1;
           left: 0;
           top: 0;
           bottom: 0;
-          right: calc(100% - $preview-position * 100%);
-          background-color: rgba(150, 150, 150);
-          display: none;
+          right: calc(100% - var(--preview-position) * 100%);
+          background-color: rgba(150, 150, 150, 0.5);
         }
 
         &::after {
@@ -128,8 +128,17 @@ $progress-position: 0.1;
           left: 0;
           top: 0;
           bottom: 0;
-          right: calc(100% - $progress-position * 100%);
+          right: calc(100% - var(--progress-position) * 100%);
           background-color: red;
+        }
+
+        &__buffer {
+          position: absolute;
+          left: 0;
+          top: 0;
+          bottom: 0;
+          right: calc(100% - var(--buffer-position) * 100%);
+          background-color: rgba(150, 150, 150, 0.5);
         }
 
         &__thumb-indicator {
@@ -137,7 +146,7 @@ $progress-position: 0.1;
           height: 200%;
           top: -50%;
           transform: translateX(-50%) scale(0);
-          left: calc($progress-position * 100%);
+          left: calc(var(--progress-position) * 100%);
           background-color: red;
           border-radius: 50%;
           transition: transform 150ms ease-in-out;
@@ -150,7 +159,7 @@ $progress-position: 0.1;
           aspect-ratio: 16 / 9;
           top: -1rem;
           transform: translate(-50%, -100%);
-          left: calc($preview-position * 100%);
+          left: calc(var(--preview-position) * 100%);
           border-radius: 0.25rem;
           border: 2px solid white;
           display: none;

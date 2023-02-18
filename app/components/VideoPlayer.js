@@ -3,6 +3,7 @@ import Spinner from "./Spinner"
 
 function VideoPlayer() {
   const video = useRef(null)
+  const timelineContainer = useRef(null)
   const [isPlaying, setIsPlaying] = useState(false)
   const [isWaiting, setIsWaiting] = useState(false)
 
@@ -31,16 +32,38 @@ function VideoPlayer() {
 
     const videoElement = video.current
 
+    function onTimeUpdate() {
+      if (isWaiting) setIsWaiting(false)
+      if (!timelineContainer.current) return
+      const { currentTime, duration } = videoElement
+      const progress = currentTime / duration
+      timelineContainer.current.style.setProperty("--progress-position", progress)
+    }
+
+    function onProgress() {
+      if (!videoElement.buffered.length || !timelineContainer.current) return
+      const { duration, buffered } = videoElement
+      const bufferedEnd = buffered.end(buffered.length - 1)
+      if (timelineContainer && duration > 0) {
+        const buffer = bufferedEnd / duration
+        timelineContainer.current.style.setProperty("--buffer-position", buffer)
+      }
+    }
+
     videoElement.addEventListener("play", onPlay)
     videoElement.addEventListener("playing", onPlay)
     videoElement.addEventListener("pause", onPause)
     videoElement.addEventListener("waiting", onWaiting)
+    videoElement.addEventListener("timeupdate", onTimeUpdate)
+    videoElement.addEventListener("progress", onProgress)
 
     return () => {
       videoElement.removeEventListener("play", onPlay)
       videoElement.removeEventListener("playing", onPlay)
       videoElement.removeEventListener("pause", onPause)
       videoElement.removeEventListener("waiting", onWaiting)
+      videoElement.removeEventListener("timeupdate", onTimeUpdate)
+      videoElement.removeEventListener("progress", onProgress)
     }
   }, [video.current])
 
@@ -63,13 +86,14 @@ function VideoPlayer() {
   return (
     <div className={"video-container " + (isPlaying ? "" : "video-container--paused")}>
       {isWaiting && <Spinner />}
-      <video onClick={toggleVideo} ref={video} src="./assets/cute-cat.mp4" controlsList="nodownload"></video>
+      <video onClick={toggleVideo} ref={video} src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" controlsList="nodownload"></video>
       <img className="thumbnail-img" />
       <div className="video-container__controls">
-        <div className="video-container__controls__timeline-container">
+        <div ref={timelineContainer} className="video-container__controls__timeline-container">
           <div className="video-container__controls__timeline-container__timeline">
             <img className="video-container__controls__timeline-container__timeline__preview-img" />
             <div className="video-container__controls__timeline-container__timeline__thumb-indicator"></div>
+            <div className="video-container__controls__timeline-container__timeline__buffer"></div>
           </div>
         </div>
         <div className="video-container__controls__buttons">
