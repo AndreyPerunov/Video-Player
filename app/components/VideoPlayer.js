@@ -86,7 +86,7 @@ function VideoPlayer() {
   return (
     <div className={"video-container " + (isPlaying ? "" : "video-container--paused")}>
       {isWaiting && <Spinner />}
-      <video onClick={toggleVideo} ref={video} src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" controlsList="nodownload"></video>
+      <video onClick={toggleVideo} ref={video} src="../assets/cute-cat.mp4" controlsList="nodownload"></video>
       <img className="thumbnail-img" />
       <div className="video-container__controls">
         <div ref={timelineContainer} className="video-container__controls__timeline-container">
