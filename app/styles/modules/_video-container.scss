@@ -1,9 +1,11 @@
+.theater > .video-container {
+  max-height: 80vh;
+}
+
 .video-container {
   overflow: hidden;
   width: 100%;
   position: relative;
-  min-height: 480px;
-  max-height: 30vh;
   background-color: black;
   display: flex;
   justify-content: center;

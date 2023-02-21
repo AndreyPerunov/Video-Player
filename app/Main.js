@@ -10,7 +10,7 @@ import Cards from "./components/Cards"
 function Main() {
   return (
     <>
-      {/* <VideoPlayer /> */}
+      <div className="theater">{/* <VideoPlayer /> */}</div>
       <div className="wrapper">
         <div className="row row--gutters">
           <div className="row__large-9">
