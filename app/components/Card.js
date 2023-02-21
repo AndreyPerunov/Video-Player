@@ -1,7 +1,7 @@
 import React from "react"
 
-function Card() {
-  return <div className="card"></div>
+function Card(props) {
+  return <div className={"card " + (props.modifier ? "card--" + props.modifier : "")}></div>
 }
 
 export default Card

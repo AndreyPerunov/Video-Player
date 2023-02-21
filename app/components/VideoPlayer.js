@@ -33,7 +33,7 @@ function VideoPlayer() {
     const videoElement = video.current
 
     function onTimeUpdate() {
-      if (isWaiting) setIsWaiting(false)
+      setIsWaiting(false)
       if (!timelineContainer.current) return
       const { currentTime, duration } = videoElement
       const progress = currentTime / duration
@@ -67,9 +67,23 @@ function VideoPlayer() {
     }
   }, [video.current])
 
+  function seekToPosition(e) {
+    if (!video.current) return
+    const { left, width } = e.currentTarget.getBoundingClientRect()
+    const clickPos = (e.clientX - left) / width
+    if (clickPos < 0 || clickPos > 1) return
+
+    // const durationMs = video.current.duration * 1000 // Duration in ms
+
+    // const newElapsedTimeMs = durationMs * clickPos
+    // const newTimeSec = newElapsedTimeMs / 1000
+    video.current.currentTime = video.current.duration * clickPos // newTimeSec
+  }
+
   //TODO: I have some lags here
   function videoKeyPressHandler(e) {
-    if (e.keyCode == 75 || e.keyCode == 75) {
+    if (!video.current) return
+    if (e.keyCode == 75 || e.keyCode == 49) {
       toggleVideo()
     }
   }
@@ -90,7 +104,7 @@ function VideoPlayer() {
       <img className="thumbnail-img" />
       <div className="video-container__controls">
         <div ref={timelineContainer} className="video-container__controls__timeline-container">
-          <div className="video-container__controls__timeline-container__timeline">
+          <div className="video-container__controls__timeline-container__timeline" onClick={seekToPosition}>
             <img className="video-container__controls__timeline-container__timeline__preview-img" />
             <div className="video-container__controls__timeline-container__timeline__thumb-indicator"></div>
             <div className="video-container__controls__timeline-container__timeline__buffer"></div>
