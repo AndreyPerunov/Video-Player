@@ -9,7 +9,7 @@ const fse = require("fs-extra")
 class RunAfterCompile {
   apply(compiler) {
     compiler.hooks.done.tap("Copy images", function () {
-      fse.copySync("./app/assets", "./dist/assets")
+      fse.copySync("./app/assets", "./docs/assets")
     })
   }
 }
@@ -55,7 +55,7 @@ if (currentTask == "build") {
   config.output = {
     filename: "[name].[chunkhash].js",
     chunkFilename: "[name].[chunkhash].js",
-    path: path.resolve(__dirname, "dist"),
+    path: path.resolve(__dirname, "docs"),
     clean: true
   }
   config.optimization = {
