@@ -1,0 +1,72 @@
+@use "../base/breakpoints" as *;
+
+.container {
+  padding: 0 18px;
+  padding-top: 18px;
+  margin-left: auto;
+  max-width: 1300px;
+  margin-right: auto;
+
+  @include breakpoint(medium) {
+    padding: 0px 200px;
+    padding-top: 18px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 0fr 1fr 1fr;
+    gap: 20px 50px;
+    grid-template-areas:
+      "Video Video RightCard"
+      "Card Card RightCard"
+      "Card Card RightCard";
+  }
+}
+
+.container-theater-mode {
+  @include breakpoint(medium) {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 0fr 1fr 1fr;
+    gap: 20px 50px;
+    grid-template-areas:
+      "Video Video Video"
+      "Card Card RightCard"
+      "Card Card RightCard";
+  }
+}
+
+.container-theater-mode > .RightCard {
+  padding: 0 18px;
+
+  @include breakpoint(medium) {
+    padding: 0 200px;
+    padding: unset;
+    padding-right: 200px;
+  }
+}
+
+.container-theater-mode > .Card {
+  padding: 0 18px;
+  padding-top: 18px;
+
+  @include breakpoint(medium) {
+    padding: 0 200px;
+    padding: unset;
+    padding-left: 200px;
+  }
+}
+
+.Card {
+  grid-area: Card;
+  padding-top: 18px;
+  @include breakpoint(medium) {
+    padding-top: 0;
+  }
+}
+
+.RightCard {
+  grid-area: RightCard;
+}
+
+.video {
+  grid-area: Video;
+}
