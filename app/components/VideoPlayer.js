@@ -1,16 +1,16 @@
 import React, { useEffect, useRef, useState } from "react"
 import Spinner from "./Spinner"
 
-function VideoPlayer() {
+function VideoPlayer({ toggleThreaterMode }) {
   const video = useRef(null)
   const timelineContainer = useRef(null)
   const [isPlaying, setIsPlaying] = useState(false)
   const [isWaiting, setIsWaiting] = useState(false)
 
   useEffect(() => {
-    document.addEventListener("keyup", videoKeyPressHandler)
-    return () => document.removeEventListener("keyup", videoKeyPressHandler)
-  }, [])
+    document.addEventListener("keydown", videoKeyPressHandler)
+    return () => document.removeEventListener("keydown", videoKeyPressHandler)
+  }, [videoKeyPressHandler])
 
   useEffect(() => {
     if (!video.current) return
@@ -80,10 +80,10 @@ function VideoPlayer() {
     video.current.currentTime = video.current.duration * clickPos // newTimeSec
   }
 
-  //TODO: I have some lags here
   function videoKeyPressHandler(e) {
     if (!video.current) return
-    if (e.keyCode == 75 || e.keyCode == 49) {
+    if (e.keyCode == 75 || e.keyCode == 32) {
+      e.preventDefault()
       toggleVideo()
     }
   }
@@ -124,7 +124,7 @@ function VideoPlayer() {
               <path fill="currentColor" d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14zm-10-7h9v6h-9z" />
             </svg>
           </button>
-          <button className="video-container__controls__buttons__theater-btn">
+          <button onClick={toggleThreaterMode} className="video-container__controls__buttons__theater-btn">
             <svg className="video-container__controls__buttons__theater-btn__tall" viewBox="0 0 24 24">
               <path fill="currentColor" d="M19 6H5c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 10H5V8h14v8z" />
             </svg>
