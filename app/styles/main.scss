@@ -1,6 +1,7 @@
 @use "../../node_modules/normalize.css/normalize";
 @use "./base/global";
 @use "./base/breakpoints";
+@use "./base/scrollbar";
 @use "./modules/layout";
 @use "./modules/video-container";
 @use "./modules/card";

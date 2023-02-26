@@ -17,8 +17,7 @@ function Main() {
 
   const checkKeyPress = useCallback(
     e => {
-      const { keyCode } = e
-      if (keyCode === 84) {
+      if (e.keyCode === 84) {
         setTheaterMode(!theaterMode)
       }
     },
