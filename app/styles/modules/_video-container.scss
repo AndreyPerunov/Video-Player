@@ -118,6 +118,7 @@
           bottom: 0;
           right: calc(100% - var(--preview-position) * 100%);
           background-color: rgba(150, 150, 150, 0.5);
+          display: none;
         }
 
         &::after {

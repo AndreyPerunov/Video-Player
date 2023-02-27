@@ -4,13 +4,19 @@ import Spinner from "./Spinner"
 function VideoPlayer({ toggleThreaterMode }) {
   const video = useRef(null)
   const timelineContainer = useRef(null)
+  const previewImg = useRef(null)
   const [isPlaying, setIsPlaying] = useState(false)
   const [isWaiting, setIsWaiting] = useState(false)
 
   useEffect(() => {
-    document.addEventListener("keydown", videoKeyPressHandler)
-    return () => document.removeEventListener("keydown", videoKeyPressHandler)
-  }, [videoKeyPressHandler])
+    document.addEventListener("keydown", onKeyDown)
+    return () => document.removeEventListener("keydown", onKeyDown)
+  }, [onKeyDown])
+
+  useEffect(() => {
+    document.addEventListener("mousemove", onMouseMove)
+    return () => document.removeEventListener("mousemove", onMouseMove)
+  }, [onMouseMove])
 
   useEffect(() => {
     if (!video.current) return
@@ -80,11 +86,22 @@ function VideoPlayer({ toggleThreaterMode }) {
     video.current.currentTime = video.current.duration * clickPos // newTimeSec
   }
 
-  function videoKeyPressHandler(e) {
+  function onKeyDown(e) {
     if (!video.current) return
     if (e.keyCode == 75 || e.keyCode == 32) {
       e.preventDefault()
       toggleVideo()
+    }
+  }
+
+  function onMouseMove(e) {
+    if (!video.current) return
+    const { width, left } = timelineContainer.current.getBoundingClientRect()
+    const mousePos = (e.x - left) / width
+    if (mousePos >= 0 && mousePos <= 1) {
+      const previewImgNumber = Math.floor(mousePos * 20) + 1
+      previewImg.current.src = `./assets/previewImages/preview${previewImgNumber}.jpg`
+      timelineContainer.current.style.setProperty("--preview-position", mousePos)
     }
   }
 
@@ -105,7 +122,7 @@ function VideoPlayer({ toggleThreaterMode }) {
       <div className="video-container__controls">
         <div ref={timelineContainer} className="video-container__controls__timeline-container">
           <div className="video-container__controls__timeline-container__timeline" onClick={seekToPosition}>
-            <img className="video-container__controls__timeline-container__timeline__preview-img" />
+            <img ref={previewImg} className="video-container__controls__timeline-container__timeline__preview-img" />
             <div className="video-container__controls__timeline-container__timeline__thumb-indicator"></div>
             <div className="video-container__controls__timeline-container__timeline__buffer"></div>
           </div>
