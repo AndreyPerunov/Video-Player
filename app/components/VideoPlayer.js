@@ -1,12 +1,35 @@
-import React, { useEffect, useRef, useState } from "react"
+import React, { useCallback, useEffect, useRef, useState } from "react"
 import Spinner from "./Spinner"
 
-function VideoPlayer({ toggleThreaterMode }) {
+function VideoPlayer({ setOutside }) {
   const video = useRef(null)
   const timelineContainer = useRef(null)
   const previewImg = useRef(null)
   const [isPlaying, setIsPlaying] = useState(false)
   const [isWaiting, setIsWaiting] = useState(false)
+  const [isFullScreen, setIsFullScreen] = useState(false)
+  const [isTheaterMode, setIsTheaterMode] = useState(false)
+
+  const onKeyDown = useCallback(
+    e => {
+      if (!video.current) return
+      // 75 - k
+      // 32 - space bar
+      if (e.keyCode == 75 || e.keyCode == 32) {
+        e.preventDefault()
+        toggleVideo()
+      }
+      // 84 - t
+      if (e.keyCode === 84) {
+        toggleIsTheater()
+      }
+      // 70 - f
+      if (e.keyCode === 70) {
+        toggleIsFullScreen()
+      }
+    },
+    [isTheaterMode, isPlaying, isFullScreen]
+  )
 
   useEffect(() => {
     document.addEventListener("keydown", onKeyDown)
@@ -19,26 +42,31 @@ function VideoPlayer({ toggleThreaterMode }) {
   }, [onMouseMove])
 
   useEffect(() => {
+    if (isTheaterMode || isFullScreen) setOutside(true)
+    else setOutside(false)
+  }, [isTheaterMode, isFullScreen])
+
+  useEffect(() => {
     if (!video.current) return
 
-    function onPlay() {
+    const onPlay = () => {
       if (isWaiting) setIsWaiting(false)
       setIsPlaying(true)
     }
 
-    function onPause() {
+    const onPause = () => {
       if (isWaiting) setIsWaiting(false)
       setIsPlaying(false)
     }
 
-    function onWaiting() {
+    const onWaiting = () => {
       if (isPlaying) setIsWaiting(false)
       setIsWaiting(true)
     }
 
     const videoElement = video.current
 
-    function onTimeUpdate() {
+    const onTimeUpdate = () => {
       setIsWaiting(false)
       if (!timelineContainer.current) return
       const { currentTime, duration } = videoElement
@@ -46,7 +74,7 @@ function VideoPlayer({ toggleThreaterMode }) {
       timelineContainer.current.style.setProperty("--progress-position", progress)
     }
 
-    function onProgress() {
+    const onProgress = () => {
       if (!videoElement.buffered.length || !timelineContainer.current) return
       const { duration, buffered } = videoElement
       const bufferedEnd = buffered.end(buffered.length - 1)
@@ -86,14 +114,6 @@ function VideoPlayer({ toggleThreaterMode }) {
     video.current.currentTime = video.current.duration * clickPos // newTimeSec
   }
 
-  function onKeyDown(e) {
-    if (!video.current) return
-    if (e.keyCode == 75 || e.keyCode == 32) {
-      e.preventDefault()
-      toggleVideo()
-    }
-  }
-
   function onMouseMove(e) {
     if (!video.current) return
     const { width, left } = timelineContainer.current.getBoundingClientRect()
@@ -107,15 +127,26 @@ function VideoPlayer({ toggleThreaterMode }) {
 
   function toggleVideo() {
     if (!video.current) return
-    if (isPlaying) {
-      video.current.pause()
-    } else {
-      video.current.play()
-    }
+    if (isPlaying) video.current.pause()
+    else video.current.play()
+  }
+
+  function toggleIsTheater() {
+    if (!video.current) return
+    if (!isTheaterMode) setIsFullScreen(false)
+    setIsTheaterMode(!isTheaterMode)
+    console.log({ isTheaterMode })
+  }
+
+  function toggleIsFullScreen() {
+    if (!video.current) return
+    if (!isFullScreen) setIsTheaterMode(false)
+    setIsFullScreen(!isFullScreen)
+    console.log({ isFullScreen })
   }
 
   return (
-    <div className={"video-container " + (isPlaying ? "" : "video-container--paused")}>
+    <div className={"video-container " + (isPlaying ? "" : "video-container--paused ") + (isTheaterMode ? "video-container--theater " : "") + (isFullScreen ? "video-container--full-screen " : "")}>
       {isWaiting && <Spinner />}
       <video onClick={toggleVideo} ref={video} src="./assets/cute-cat.mp4" controlsList="nodownload"></video>
       <img className="thumbnail-img" />
@@ -141,7 +172,7 @@ function VideoPlayer({ toggleThreaterMode }) {
               <path fill="currentColor" d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14zm-10-7h9v6h-9z" />
             </svg>
           </button>
-          <button onClick={toggleThreaterMode} className="video-container__controls__buttons__theater-btn">
+          <button onClick={toggleIsTheater} className="video-container__controls__buttons__theater-btn">
             <svg className="video-container__controls__buttons__theater-btn__tall" viewBox="0 0 24 24">
               <path fill="currentColor" d="M19 6H5c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 10H5V8h14v8z" />
             </svg>
@@ -149,7 +180,7 @@ function VideoPlayer({ toggleThreaterMode }) {
               <path fill="currentColor" d="M19 7H5c-1.1 0-2 .9-2 2v6c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2zm0 8H5V9h14v6z" />
             </svg>
           </button>
-          <button className="video-container__controls__buttons__full-screen-btn">
+          <button onClick={toggleIsFullScreen} className="video-container__controls__buttons__full-screen-btn">
             <svg className="video-container__controls__buttons__full-screen-btn__open" viewBox="0 0 24 24">
               <path fill="currentColor" d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z" />
             </svg>

@@ -8,32 +8,13 @@ import VideoPlayer from "./components/VideoPlayer"
 import Cards from "./components/Cards"
 
 function Main() {
-  const [theaterMode, setTheaterMode] = useState(false)
-
-  const handleTheaterModeToggle = () => {
-    console.log(theaterMode)
-    setTheaterMode(!theaterMode)
-  }
-
-  const checkKeyPress = useCallback(
-    e => {
-      if (e.keyCode === 84) {
-        setTheaterMode(!theaterMode)
-      }
-    },
-    [theaterMode]
-  )
-
-  useEffect(() => {
-    document.addEventListener("keydown", checkKeyPress)
-    return () => document.addEventListener("keydown", checkKeyPress)
-  }, [checkKeyPress])
+  const [outside, setOutside] = useState(false)
 
   return (
     <>
-      <div className={`${theaterMode ? "container-theater-mode" : "container"}`}>
+      <div className={`${outside ? "container-outside" : "container"}`}>
         <div className="video">
-          <VideoPlayer toggleThreaterMode={handleTheaterModeToggle} />
+          <VideoPlayer setOutside={setOutside} />
         </div>
         <div className="Card">
           <Cards amount="12" modifier="green" />

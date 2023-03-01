@@ -21,7 +21,7 @@
   }
 }
 
-.container-theater-mode {
+.container-outside {
   @include breakpoint(medium) {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
@@ -34,7 +34,7 @@
   }
 }
 
-.container-theater-mode > .RightCard {
+.container-outside > .RightCard {
   padding: 0 18px;
 
   @include breakpoint(medium) {
@@ -44,7 +44,7 @@
   }
 }
 
-.container-theater-mode > .Card {
+.container-outside > .Card {
   padding: 0 18px;
   padding-top: 18px;
 

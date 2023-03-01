@@ -1,14 +1,22 @@
-.container-theater-mode > .video > .video-container {
-  max-height: 80vh;
-}
-
 .video-container {
+  position: relative;
   overflow: hidden;
   width: 100%;
-  position: relative;
-  background-color: black;
   display: flex;
   justify-content: center;
+  background-color: black;
+
+  &--theater {
+    max-height: 90vh;
+  }
+
+  &--full-screen {
+    max-height: 100vh;
+  }
+
+  &--full-screen body {
+    overflow: hidden;
+  }
 
   video {
     width: 100%;
@@ -25,6 +33,22 @@
   }
 
   &:not(&--paused) &__controls__buttons__play-pause-btn__play-icon {
+    display: none;
+  }
+
+  &--theater &__controls__buttons__theater-btn__tall {
+    display: none;
+  }
+
+  &:not(&--theater) &__controls__buttons__theater-btn__wide {
+    display: none;
+  }
+
+  &--full-screen &__controls__buttons__full-screen-btn__open {
+    display: none;
+  }
+
+  &:not(&--full-screen) &__controls__buttons__full-screen-btn__close {
     display: none;
   }
 
