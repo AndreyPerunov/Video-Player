@@ -3,6 +3,7 @@ import Spinner from "./Spinner"
 
 function VideoPlayer({ setOutside }) {
   const video = useRef(null)
+  const videoContainer = useRef(null)
   const timelineContainer = useRef(null)
   const previewImg = useRef(null)
   const [isPlaying, setIsPlaying] = useState(false)
@@ -133,20 +134,23 @@ function VideoPlayer({ setOutside }) {
 
   function toggleIsTheater() {
     if (!video.current) return
-    if (!isTheaterMode) setIsFullScreen(false)
+    if (!isTheaterMode) {
+      setIsFullScreen(false)
+      document.exitFullscreen()
+    }
     setIsTheaterMode(!isTheaterMode)
-    console.log({ isTheaterMode })
   }
 
   function toggleIsFullScreen() {
     if (!video.current) return
     if (!isFullScreen) setIsTheaterMode(false)
     setIsFullScreen(!isFullScreen)
-    console.log({ isFullScreen })
+    if (document.fullscreenElement == null) videoContainer.current.requestFullscreen()
+    else document.exitFullscreen()
   }
 
   return (
-    <div className={"video-container " + (isPlaying ? "" : "video-container--paused ") + (isTheaterMode ? "video-container--theater " : "") + (isFullScreen ? "video-container--full-screen " : "")}>
+    <div ref={videoContainer} className={"video-container " + (isPlaying ? "" : "video-container--paused ") + (isTheaterMode ? "video-container--theater " : "") + (isFullScreen ? "video-container--full-screen " : "")}>
       {isWaiting && <Spinner />}
       <video onClick={toggleVideo} ref={video} src="./assets/cute-cat.mp4" controlsList="nodownload"></video>
       <img className="thumbnail-img" />
