@@ -10,26 +10,34 @@ function VideoPlayer({ setOutside }) {
   const [isWaiting, setIsWaiting] = useState(false)
   const [isFullScreen, setIsFullScreen] = useState(false)
   const [isTheaterMode, setIsTheaterMode] = useState(false)
+  const [isMiniPlayer, setIsMiniPlayer] = useState(false)
 
   const onKeyDown = useCallback(
     e => {
-      if (!video.current) return
-      // 75 - k
-      // 32 - space bar
-      if (e.keyCode == 75 || e.keyCode == 32) {
-        e.preventDefault()
-        toggleVideo()
-      }
-      // 84 - t
-      if (e.keyCode === 84) {
-        toggleIsTheater()
-      }
-      // 70 - f
-      if (e.keyCode === 70) {
-        toggleIsFullScreen()
+      const tagName = document.activeElement.tagName.toLowerCase()
+      if (!video.current || tagName === "input") return
+      switch (e.key.toLowerCase()) {
+        case " ":
+          if (tagName === "button") return
+          console.log(tagName)
+          e.preventDefault()
+          toggleVideo()
+          break
+        case "k":
+          toggleVideo()
+          break
+        case "t":
+          toggleIsTheater()
+          break
+        case "f":
+          toggleIsFullScreen()
+          return
+        case "i":
+          toggleIsMiniPlayer()
+          return
       }
     },
-    [isTheaterMode, isPlaying, isFullScreen]
+    [isTheaterMode, isPlaying, isFullScreen, isMiniPlayer]
   )
 
   useEffect(() => {
@@ -136,21 +144,39 @@ function VideoPlayer({ setOutside }) {
     if (!video.current) return
     if (!isTheaterMode) {
       setIsFullScreen(false)
-      document.exitFullscreen()
+      setIsMiniPlayer(false)
+      isFullScreen ? document.exitFullscreen() : ""
+      isMiniPlayer ? document.exitPictureInPicture() : ""
     }
     setIsTheaterMode(!isTheaterMode)
   }
 
+  function toggleIsMiniPlayer() {
+    if (!video.current) return
+    if (!isMiniPlayer) {
+      setIsTheaterMode(false)
+      setIsFullScreen(false)
+      isFullScreen ? document.exitFullscreen() : ""
+    }
+    setIsMiniPlayer(!isMiniPlayer)
+    if (!isMiniPlayer) video.current.requestPictureInPicture()
+    else document.exitPictureInPicture()
+  }
+
   function toggleIsFullScreen() {
     if (!video.current) return
-    if (!isFullScreen) setIsTheaterMode(false)
+    if (!isFullScreen) {
+      setIsTheaterMode(false)
+      setIsMiniPlayer(false)
+      isMiniPlayer ? document.exitPictureInPicture() : ""
+    }
     setIsFullScreen(!isFullScreen)
     if (document.fullscreenElement == null) videoContainer.current.requestFullscreen()
     else document.exitFullscreen()
   }
 
   return (
-    <div ref={videoContainer} className={"video-container " + (isPlaying ? "" : "video-container--paused ") + (isTheaterMode ? "video-container--theater " : "") + (isFullScreen ? "video-container--full-screen " : "")}>
+    <div ref={videoContainer} className={"video-container " + (isPlaying ? "" : "video-container--paused ") + (isTheaterMode ? "video-container--theater " : "") + (isFullScreen ? "video-container--full-screen " : "") + (isMiniPlayer ? "video-container--mini-player " : "")}>
       {isWaiting && <Spinner />}
       <video onClick={toggleVideo} ref={video} src="./assets/cute-cat.mp4" controlsList="nodownload"></video>
       <img className="thumbnail-img" />
@@ -171,7 +197,7 @@ function VideoPlayer({ setOutside }) {
               <path fill="currentColor" d="M14,19H18V5H14M6,19H10V5H6V19Z" />
             </svg>
           </button>
-          <button className="video-container__controls__buttons__mini-player-btn">
+          <button onClick={toggleIsMiniPlayer} className="video-container__controls__buttons__mini-player-btn">
             <svg viewBox="0 0 24 24">
               <path fill="currentColor" d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14zm-10-7h9v6h-9z" />
             </svg>
