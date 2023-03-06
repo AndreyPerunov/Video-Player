@@ -9,11 +9,12 @@ function VideoPlayer({ setOutside }) {
   const previewImg = useRef(null)
   const [isPlaying, setIsPlaying] = useState(false)
   const [isWaiting, setIsWaiting] = useState(false)
+  // const [isScrubbing, setIsScrubbing] = useState(false)
   const [isFullScreen, setIsFullScreen] = useState(false)
   const [isTheaterMode, setIsTheaterMode] = useState(false)
   const [isMiniPlayer, setIsMiniPlayer] = useState(false)
-  const [volume, setVolume] = useState(1)
   const [volumeLevel, setVolumeLevel] = useState("high")
+  const [volume, setVolume] = useState(1)
   const [durationTime, setDurationTime] = useState(0)
   const [elapsedTime, setElapsedTime] = useState(0)
   const [playbackRate, setPlaybackRate] = useState(1)
@@ -66,8 +67,8 @@ function VideoPlayer({ setOutside }) {
   }, [onKeyDown])
 
   useEffect(() => {
-    document.addEventListener("mousemove", onMouseMove)
-    return () => document.removeEventListener("mousemove", onMouseMove)
+    timelineContainer.current.addEventListener("mousemove", onMouseMove)
+    return () => timelineContainer.current.removeEventListener("mousemove", onMouseMove)
   }, [onMouseMove])
 
   useEffect(() => {
