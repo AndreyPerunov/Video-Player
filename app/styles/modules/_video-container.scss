@@ -107,6 +107,10 @@
         &:hover {
           opacity: 1;
         }
+
+        &.video-container__controls__buttons__speed-btn {
+          width: 50px;
+        }
       }
 
       &__volume-container {
@@ -132,6 +136,13 @@
           width: 100px;
           transform: scaleX(1);
         }
+      }
+
+      &__duration-container {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        flex-grow: 1;
       }
     }
 

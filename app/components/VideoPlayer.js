@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react"
 import Spinner from "./Spinner"
+import TimeTracker from "./TimeTracker"
 
 function VideoPlayer({ setOutside }) {
   const video = useRef(null)
@@ -13,6 +14,9 @@ function VideoPlayer({ setOutside }) {
   const [isMiniPlayer, setIsMiniPlayer] = useState(false)
   const [volume, setVolume] = useState(1)
   const [volumeLevel, setVolumeLevel] = useState("high")
+  const [durationTime, setDurationTime] = useState(0)
+  const [elapsedTime, setElapsedTime] = useState(0)
+  const [playbackRate, setPlaybackRate] = useState(1)
 
   const onKeyDown = useCallback(
     e => {
@@ -21,7 +25,6 @@ function VideoPlayer({ setOutside }) {
       switch (e.key.toLowerCase()) {
         case " ":
           if (tagName === "button") return
-          console.log(tagName)
           e.preventDefault()
           toggleVideo()
           break
@@ -36,6 +39,21 @@ function VideoPlayer({ setOutside }) {
           return
         case "i":
           toggleIsMiniPlayer()
+          return
+        case "m":
+          toggleMute()
+          return
+        case "arrowleft":
+          skip(-5)
+          return
+        case "j":
+          skip(-10)
+          return
+        case "arrowright":
+          skip(5)
+          return
+        case "l":
+          skip(10)
           return
       }
     },
@@ -65,6 +83,12 @@ function VideoPlayer({ setOutside }) {
 
   useEffect(() => {
     if (!video.current) return
+    if (playbackRate === video.current.playbackRate) return
+    video.current.playbackRate = playbackRate
+  }, [playbackRate])
+
+  useEffect(() => {
+    if (!video.current) return
 
     const onPlay = () => {
       if (isWaiting) setIsWaiting(false)
@@ -88,7 +112,12 @@ function VideoPlayer({ setOutside }) {
       if (!timelineContainer.current) return
       const { currentTime, duration } = videoElement
       const progress = currentTime / duration
+      setElapsedTime(currentTime)
       timelineContainer.current.style.setProperty("--progress-position", progress)
+    }
+
+    const onDurationchange = () => {
+      setDurationTime(videoElement.duration)
     }
 
     const onProgress = () => {
@@ -109,8 +138,6 @@ function VideoPlayer({ setOutside }) {
         setVolumeLevel("muted")
         setVolume(0)
       }
-
-      console.log("onVolumeChange")
     }
 
     videoElement.addEventListener("play", onPlay)
@@ -118,6 +145,7 @@ function VideoPlayer({ setOutside }) {
     videoElement.addEventListener("pause", onPause)
     videoElement.addEventListener("waiting", onWaiting)
     videoElement.addEventListener("timeupdate", onTimeUpdate)
+    videoElement.addEventListener("durationchange", onDurationchange)
     videoElement.addEventListener("progress", onProgress)
     videoElement.addEventListener("volumechange", onVolumeChange)
 
@@ -127,6 +155,7 @@ function VideoPlayer({ setOutside }) {
       videoElement.removeEventListener("pause", onPause)
       videoElement.removeEventListener("waiting", onWaiting)
       videoElement.removeEventListener("timeupdate", onTimeUpdate)
+      videoElement.removeEventListener("durationchange", onDurationchange)
       videoElement.removeEventListener("progress", onProgress)
       videoElement.removeEventListener("volumechange", onVolumeChange)
     }
@@ -197,6 +226,21 @@ function VideoPlayer({ setOutside }) {
     else document.exitFullscreen()
   }
 
+  function skip(skipTime) {
+    if (!video.current) return
+    video.current.currentTime += skipTime
+  }
+
+  function changePlaybackSpeed() {
+    if (playbackRate === 2) setPlaybackRate(0.25)
+    else setPlaybackRate(playbackRate + 0.25)
+  }
+
+  function toggleMute() {
+    if (!video.current) return
+    video.current.muted = !video.current.muted
+  }
+
   return (
     <div ref={videoContainer} className={"video-container " + (isPlaying ? "" : "video-container--paused ") + (isTheaterMode ? "video-container--theater " : "") + (isFullScreen ? "video-container--full-screen " : "") + (isMiniPlayer ? "video-container--mini-player " : "")} data-volume-level={volumeLevel}>
       {isWaiting && <Spinner />}
@@ -223,12 +267,7 @@ function VideoPlayer({ setOutside }) {
           </button>
           {/* VOLUME */}
           <div className="video-container__controls__buttons__volume-container">
-            <button
-              onClick={() => {
-                video.current.muted = !video.current.muted
-              }}
-              className="video-container__controls__buttons__volume-container__mute-btn"
-            >
+            <button onClick={toggleMute} className="video-container__controls__buttons__volume-container__mute-btn">
               <svg className="video-container__controls__buttons__volume-container__mute-btn__volume-high-icon" viewBox="0 0 24 24">
                 <path fill="currentColor" d="M14,3.23V5.29C16.89,6.15 19,8.83 19,12C19,15.17 16.89,17.84 14,18.7V20.77C18,19.86 21,16.28 21,12C21,7.72 18,4.14 14,3.23M16.5,12C16.5,10.23 15.5,8.71 14,7.97V16C15.5,15.29 16.5,13.76 16.5,12M3,9V15H7L12,20V4L7,9H3Z" />
               </svg>
@@ -241,6 +280,12 @@ function VideoPlayer({ setOutside }) {
             </button>
             <input onChange={e => setVolume(e.target.value)} className="video-container__controls__buttons__volume-container__volume-slider" type="range" min="0" max="1" step="any" value={volume} />
           </div>
+          {/* TIME-TRACKER */}
+          <TimeTracker elapsedTime={elapsedTime} durationTime={durationTime} />
+          {/* SPEED */}
+          <button onClick={changePlaybackSpeed} className="video-container__controls__buttons__speed-btn">
+            {playbackRate}x
+          </button>
           {/* MINI-PLAYER */}
           <button onClick={toggleIsMiniPlayer} className="video-container__controls__buttons__mini-player-btn">
             <svg viewBox="0 0 24 24">
