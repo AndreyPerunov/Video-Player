@@ -3,13 +3,16 @@ import Spinner from "./Spinner"
 import TimeTracker from "./TimeTracker"
 
 function VideoPlayer({ setOutside }) {
+  const isInitialMount = useRef(true)
   const video = useRef(null)
   const videoContainer = useRef(null)
   const timelineContainer = useRef(null)
   const previewImg = useRef(null)
+  const thumbnailImg = useRef(null)
   const [isPlaying, setIsPlaying] = useState(false)
   const [isWaiting, setIsWaiting] = useState(false)
-  // const [isScrubbing, setIsScrubbing] = useState(false)
+  const [isScrubbing, setIsScrubbing] = useState(false)
+  const [wasPaused, setWasPaused] = useState(false)
   const [isFullScreen, setIsFullScreen] = useState(false)
   const [isTheaterMode, setIsTheaterMode] = useState(false)
   const [isMiniPlayer, setIsMiniPlayer] = useState(false)
@@ -56,6 +59,14 @@ function VideoPlayer({ setOutside }) {
         case "l":
           skip(10)
           return
+        case "arrowup":
+          e.preventDefault()
+          addVolume(0.05)
+          return
+        case "arrowdown":
+          e.preventDefault()
+          addVolume(-0.05)
+          return
       }
     },
     [isTheaterMode, isPlaying, isFullScreen, isMiniPlayer]
@@ -67,9 +78,41 @@ function VideoPlayer({ setOutside }) {
   }, [onKeyDown])
 
   useEffect(() => {
-    timelineContainer.current.addEventListener("mousemove", onMouseMove)
-    return () => timelineContainer.current.removeEventListener("mousemove", onMouseMove)
+    timelineContainer.current.addEventListener("mousemove", onMouseMoveTimeline)
+    return () => timelineContainer.current.removeEventListener("mousemove", onMouseMoveTimeline)
+  }, [onMouseMoveTimeline])
+
+  useEffect(() => {
+    timelineContainer.current.addEventListener("mousedown", toggleIsScrubbing)
+    return () => timelineContainer.current.removeEventListener("mousedown", toggleIsScrubbing)
+  }, [toggleIsScrubbing])
+
+  useEffect(() => {
+    document.addEventListener("mouseup", onMouseUp)
+    return () => document.removeEventListener("mouseup", onMouseUp)
+  }, [onMouseUp])
+
+  useEffect(() => {
+    document.addEventListener("mousemove", onMouseMove)
+    return () => document.removeEventListener("mousemove", onMouseMove)
   }, [onMouseMove])
+
+  useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false
+    } else {
+      let e = window.event
+      if (isScrubbing) {
+        setWasPaused(!video.current.paused)
+        video.current.pause()
+      } else {
+        const { width, left } = timelineContainer.current.getBoundingClientRect()
+        const mousePos = (e.x - left) / width
+        video.current.currentTime = video.current.duration * mousePos
+        if (wasPaused) video.current.play()
+      }
+    }
+  }, [isScrubbing])
 
   useEffect(() => {
     if (isTheaterMode || isFullScreen) setOutside(true)
@@ -79,7 +122,9 @@ function VideoPlayer({ setOutside }) {
   useEffect(() => {
     if (!video.current) return
     video.current.muted = volume == 0
-    if (volume != 0) video.current.volume = volume
+    if (volume > 1) setVolume(1)
+    if (volume < 0) setVolume(0)
+    if (volume > 0 && volume <= 1) video.current.volume = volume
   }, [volume])
 
   useEffect(() => {
@@ -167,15 +212,10 @@ function VideoPlayer({ setOutside }) {
     const { left, width } = e.currentTarget.getBoundingClientRect()
     const clickPos = (e.clientX - left) / width
     if (clickPos < 0 || clickPos > 1) return
-
-    // const durationMs = video.current.duration * 1000 // Duration in ms
-
-    // const newElapsedTimeMs = durationMs * clickPos
-    // const newTimeSec = newElapsedTimeMs / 1000
-    video.current.currentTime = video.current.duration * clickPos // newTimeSec
+    video.current.currentTime = video.current.duration * clickPos
   }
 
-  function onMouseMove(e) {
+  function onMouseMoveTimeline(e) {
     if (!video.current) return
     const { width, left } = timelineContainer.current.getBoundingClientRect()
     const mousePos = (e.x - left) / width
@@ -184,6 +224,25 @@ function VideoPlayer({ setOutside }) {
       previewImg.current.src = `./assets/previewImages/preview${previewImgNumber}.jpg`
       timelineContainer.current.style.setProperty("--preview-position", mousePos)
     }
+
+    if (isScrubbing) {
+      e.preventDefault()
+      thumbnailImg.current.src = previewImg.current.src
+      timelineContainer.current.style.setProperty("--progress-position", mousePos)
+    }
+  }
+
+  function toggleIsScrubbing(e) {
+    setIsScrubbing(e.buttons === 1)
+    onMouseMoveTimeline(e)
+  }
+
+  function onMouseUp(e) {
+    if (isScrubbing) toggleIsScrubbing(e)
+  }
+
+  function onMouseMove(e) {
+    if (isScrubbing) toggleIsScrubbing(e)
   }
 
   function toggleVideo() {
@@ -232,6 +291,11 @@ function VideoPlayer({ setOutside }) {
     video.current.currentTime += skipTime
   }
 
+  function addVolume(amount) {
+    if (!video.current) return
+    setVolume(prevVolume => prevVolume + amount)
+  }
+
   function changePlaybackSpeed() {
     if (playbackRate === 2) setPlaybackRate(0.25)
     else setPlaybackRate(playbackRate + 0.25)
@@ -243,17 +307,17 @@ function VideoPlayer({ setOutside }) {
   }
 
   return (
-    <div ref={videoContainer} className={"video-container " + (isPlaying ? "" : "video-container--paused ") + (isTheaterMode ? "video-container--theater " : "") + (isFullScreen ? "video-container--full-screen " : "") + (isMiniPlayer ? "video-container--mini-player " : "")} data-volume-level={volumeLevel}>
+    <div ref={videoContainer} className={"video-container " + (isPlaying ? "" : "video-container--paused ") + (isTheaterMode ? "video-container--theater " : "") + (isFullScreen ? "video-container--full-screen " : "") + (isMiniPlayer ? "video-container--mini-player " : "") + (isScrubbing ? "video-container--scrubbing " : "")} data-volume-level={volumeLevel}>
       {isWaiting && <Spinner />}
       <video onClick={toggleVideo} ref={video} src="./assets/cute-cat.mp4" controlsList="nodownload"></video>
-      <img className="thumbnail-img" />
+      <img ref={thumbnailImg} className="video-container__thumbnail-img" />
       <div className="video-container__controls">
         {/* TIME-LINE */}
         <div ref={timelineContainer} className="video-container__controls__timeline-container">
           <div className="video-container__controls__timeline-container__timeline" onClick={seekToPosition}>
             <img ref={previewImg} className="video-container__controls__timeline-container__timeline__preview-img" />
-            <div className="video-container__controls__timeline-container__timeline__thumb-indicator"></div>
             <div className="video-container__controls__timeline-container__timeline__buffer"></div>
+            <div className="video-container__controls__timeline-container__timeline__thumb-indicator"></div>
           </div>
         </div>
         <div className="video-container__controls__buttons">
