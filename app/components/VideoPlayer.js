@@ -21,6 +21,10 @@ function VideoPlayer({ setOutside }) {
   const [durationTime, setDurationTime] = useState(0)
   const [elapsedTime, setElapsedTime] = useState(0)
   const [playbackRate, setPlaybackRate] = useState(1)
+  const [previewTime, setPreviewTime] = useState(0)
+
+  const previewTimeMin = Math.floor(previewTime / 60)
+  const previewTimeSec = Math.floor(previewTime % 60)
 
   const onKeyDown = useCallback(
     e => {
@@ -221,6 +225,7 @@ function VideoPlayer({ setOutside }) {
     const mousePos = (e.x - left) / width
     if (mousePos >= 0 && mousePos <= 1) {
       const previewImgNumber = Math.floor(mousePos * 20) + 1
+      setPreviewTime(mousePos * video.current.duration)
       previewImg.current.src = `./assets/previewImages/preview${previewImgNumber}.jpg`
       timelineContainer.current.style.setProperty("--preview-position", mousePos)
     }
@@ -315,7 +320,12 @@ function VideoPlayer({ setOutside }) {
         {/* TIME-LINE */}
         <div ref={timelineContainer} className="video-container__controls__timeline-container">
           <div className="video-container__controls__timeline-container__timeline" onClick={seekToPosition}>
-            <img ref={previewImg} className="video-container__controls__timeline-container__timeline__preview-img" />
+            <div className="video-container__controls__timeline-container__timeline__preview">
+              <img ref={previewImg} className="video-container__controls__timeline-container__timeline__preview__img" />
+              <span className="video-container__controls__timeline-container__timeline__preview__time">
+                {previewTimeMin}:{previewTimeSec.toString().padStart(2, "0")}
+              </span>
+            </div>
             <div className="video-container__controls__timeline-container__timeline__buffer"></div>
             <div className="video-container__controls__timeline-container__timeline__thumb-indicator"></div>
           </div>

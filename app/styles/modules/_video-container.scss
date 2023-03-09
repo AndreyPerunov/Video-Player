@@ -172,8 +172,8 @@
         display: block;
       }
 
-      .video-container--scrubbing &__timeline__preview-img,
-      &:hover &__timeline__preview-img {
+      .video-container--scrubbing &__timeline__preview,
+      &:hover &__timeline__preview {
         display: block;
       }
 
@@ -225,16 +225,25 @@
           aspect-ratio: 1 / 1;
         }
 
-        &__preview-img {
+        &__preview {
           position: absolute;
           height: 80px;
-          aspect-ratio: 16 / 9;
-          top: -1rem;
+          top: -1.5rem;
           transform: translate(-50%, -100%);
           left: calc(var(--preview-position) * 100%);
-          border-radius: 0.25rem;
-          border: 2px solid white;
           display: none;
+
+          &__img {
+            aspect-ratio: 16 / 9;
+            border-radius: 0.25rem;
+            border: 2px solid white;
+          }
+
+          &__time {
+            text-align: center;
+            display: block;
+            text-shadow: 1px 1px 3px black;
+          }
         }
       }
     }
